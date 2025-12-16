@@ -1,6 +1,6 @@
 from typing import List, Optional
 from django.db.models import QuerySet
-from .models import Deporte, Evento, Participante, EventoParticipante
+from .models import Deporte, Evento, Participante, EventoParticipante, Equipo
 
 
 class DeporteRepository:
@@ -203,5 +203,62 @@ class EventoRepository:
             inscripcion.delete()
             return True
         except EventoParticipante.DoesNotExist:
+            return False
+
+
+class EquipoRepository:
+    """Repositorio para operaciones de acceso a datos de Equipo"""
+
+    @staticmethod
+    def get_all() -> QuerySet[Equipo]:
+        """Obtener todos los equipos"""
+        return Equipo.objects.all()
+
+    @staticmethod
+    def get_by_id(equipo_id: int) -> Optional[Equipo]:
+        """Obtener un equipo por su ID"""
+        try:
+            return Equipo.objects.get(pk=equipo_id)
+        except Equipo.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_by_nombre_and_deporte(nombre: str, deporte_id: int) -> Optional[Equipo]:
+        """Obtener un equipo por nombre y deporte"""
+        try:
+            return Equipo.objects.get(nombre=nombre, deporte_id=deporte_id)
+        except Equipo.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_by_deporte(deporte_id: int) -> QuerySet[Equipo]:
+        """Obtener equipos por deporte"""
+        return Equipo.objects.filter(deporte_id=deporte_id)
+
+    @staticmethod
+    def create(nombre: str, deporte_id: int, descripcion: str = None) -> Equipo:
+        """Crear un nuevo equipo"""
+        return Equipo.objects.create(nombre=nombre, deporte_id=deporte_id, descripcion=descripcion)
+
+    @staticmethod
+    def update(equipo: Equipo, nombre: str = None, deporte_id: int = None, descripcion: str = None) -> Equipo:
+        """Actualizar un equipo existente"""
+        if nombre:
+            equipo.nombre = nombre
+        if deporte_id:
+            equipo.deporte_id = deporte_id
+        if descripcion is not None:
+            equipo.descripcion = descripcion
+        equipo.save()
+        return equipo
+
+    @staticmethod
+    def delete(equipo_id: int) -> bool:
+        """Eliminar un equipo por su ID"""
+        try:
+            equipo = Equipo.objects.get(pk=equipo_id)
+            equipo.delete()
+            return True
+        except Equipo.DoesNotExist:
             return False
 

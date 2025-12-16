@@ -83,3 +83,25 @@ class EventoParticipante(models.Model):
 
     def __str__(self):
         return f"{self.participante.nombre_completo} - {self.evento.nombre}"
+
+
+class Equipo(models.Model):
+    """Modelo para representar un equipo"""
+    nombre = models.CharField(max_length=100, verbose_name="Nombre")
+    descripcion = models.TextField(blank=True, null=True, verbose_name="Descripción")
+    deporte = models.ForeignKey(
+        Deporte,
+        on_delete=models.CASCADE,
+        related_name='equipos',
+        verbose_name="Deporte"
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
+
+    class Meta:
+        verbose_name = "Equipo"
+        verbose_name_plural = "Equipos"
+        ordering = ['nombre']
+        unique_together = ['nombre', 'deporte']
+
+    def __str__(self):
+        return f"{self.nombre} - {self.deporte.nombre}"
